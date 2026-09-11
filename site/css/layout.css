@@ -1,0 +1,264 @@
+/* ------------------------------------------------------------------
+   layout.css — cabeçalho, faixas, herói e rodapé
+   A página é uma sequência de faixas horizontais. Cada faixa tem a sua
+   própria composição; nenhuma se repete como cartão.
+   ------------------------------------------------------------------ */
+
+.envoltorio {
+  width: min(100% - (2 * var(--margem)), var(--largura));
+  margin-inline: auto;
+}
+
+/* ---------------------------------------------------------- cabeçalho */
+
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--papel) 92%, transparent);
+  backdrop-filter: saturate(1.5) blur(12px);
+  border-bottom: 1px solid var(--borda);
+}
+
+.cabecalho__barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-3);
+  min-height: var(--altura-cabecalho);
+}
+
+.marca { display: inline-flex; align-items: center; flex: 0 0 auto; }
+.marca img { width: clamp(125px, 16vw, 185px); height: auto; }
+
+.cabecalho__direita {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1.5vw, 1.5rem);
+}
+
+.navegacao__lista {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1.6vw, 1.6rem);
+  margin: 0; padding: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.navegacao__lista::-webkit-scrollbar { display: none; }
+
+.navegacao__lista a {
+  display: block;
+  padding: 0.45rem 0.15rem;
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  font-size: var(--t-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--texto-suave);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color .16s ease, border-color .16s ease;
+}
+.navegacao__lista a:hover { color: var(--acento-texto); border-bottom-color: var(--folha); }
+.navegacao__lista a[aria-current="true"] { color: var(--acento-texto); border-bottom-color: var(--verde); font-weight: 700; }
+
+.cabecalho__cta {
+  display: inline-flex;
+  align-items: center;
+  background: var(--gradiente-dourado);
+  color: #05331a;
+  border: 0;
+  border-radius: var(--raio-pill);
+  padding: 0.45rem 1rem;
+  font: 700 var(--t-xs) var(--fonte-titulo);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(251,184,0,0.3);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.cabecalho__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(251,184,0,0.45);
+}
+
+@media (max-width: 768px) {
+  .cabecalho__cta { display: none; }
+}
+
+
+/* ------------------------------------------------------------ faixas */
+
+.faixa {
+  padding-block: var(--e-faixa);
+  scroll-margin-top: calc(var(--altura-cabecalho) + 8px);
+  position: relative;
+}
+.faixa--mata {
+  background: var(--verde-mata);
+  --texto: #e4ede5;
+  --texto-suave: #a9c1ae;
+  --acento-texto: #ffffff;
+  --borda: #1d4b30;
+  --papel: #0b4324;
+  --foco: var(--amarelo);
+  color: var(--texto);
+}
+
+.faixa__cabecalho {
+  display: grid;
+  gap: var(--e-3) var(--e-6);
+  margin-bottom: var(--e-6);
+}
+/* -------------------------------------------------------------- herói */
+/* O cartaz oficial abre a página em sangria. Logo abaixo, a faixa de
+   identificação repete em texto acessível tudo o que a arte informa. */
+
+.heroi { scroll-margin-top: calc(var(--altura-cabecalho) + 8px); }
+
+/* A arte oficial entra em sangria, com a folga inferior aparada para que
+   a faixa de identificação já apareça na primeira tela. */
+.cartaz {
+  margin: 0;
+  background: var(--creme);
+  aspect-ratio: 1672 / 748;
+  overflow: hidden;
+}
+.cartaz img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0;
+}
+
+/* No celular a arte aparece inteira, sem aparo: a faixa de identificação
+   logo abaixo repete nome, cargo e número em texto legível. */
+@media (max-width: 719px) {
+  .cartaz { aspect-ratio: 1672 / 941; }
+}
+
+/* O cartaz acima carrega cargo, nome, lema e número em corpo grande. Esta
+   faixa não repete nada disso: é uma tira de ação, com a instrução da urna
+   e o botão lado a lado. */
+
+.identificacao {
+  background: var(--verde-mata);
+  color: #e4ede5;
+  border-top: 3px solid var(--dourado);
+  padding-block: clamp(1.4rem, 2.8vw, 2.2rem);
+  --texto-suave: #b6cdbb;
+  --foco: var(--amarelo);
+}
+
+.identificacao__grade {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-4);
+}
+
+.identificacao__esquerda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.identificacao__badge-apoio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.8rem;
+  border-radius: var(--raio-pill);
+  font: 700 var(--t-xs) var(--fonte-titulo);
+  color: var(--dourado);
+  width: fit-content;
+}
+
+.identificacao__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e-3);
+}
+
+.identificacao .botao--primario {
+  background: #0a7a36 !important;
+  border: 2px solid #15a34a !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+.identificacao .botao--primario:hover {
+  background: #0d9241 !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.identificacao .botao--dourado {
+  background: #fbb800 !important;
+  background: linear-gradient(135deg, #ffd438 0%, #fbb800 100%) !important;
+  border: 2px solid #e09f00 !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(251, 184, 0, 0.4) !important;
+}
+.identificacao .botao--dourado:hover {
+  background: #ffe066 !important;
+  color: #000000 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(251, 184, 0, 0.55) !important;
+}
+
+
+/* -------------------------------------------------------------- rodapé */
+/* Uma coluna, quatro linhas: marca, identidade, canais e ressalva. O
+   WhatsApp tem botão flutuante, então aqui ele é texto como o resto. */
+
+.rodape {
+  background: var(--superficie);
+  border-top: 3px solid var(--folha);
+  padding-block: clamp(2.25rem, 4vw, 3.25rem) var(--e-5);
+}
+.rodape__grade { display: grid; justify-items: start; gap: var(--e-3); }
+.rodape .marca img { width: clamp(140px, 18vw, 170px); }
+
+.rodape__identidade {
+  margin-top: var(--e-2);
+  font-size: var(--t-sm);
+  color: var(--texto-suave);
+  max-width: 66ch;
+  text-wrap: pretty;
+}
+
+.rodape__canais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--e-3);
+  font-size: var(--t-sm);
+}
+.rodape__canais a {
+  font-family: var(--fonte-titulo);
+  font-weight: 600;
+  color: var(--acento-texto);
+  text-decoration: none;
+}
+.rodape__canais a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.rodape__canais span { color: var(--borda); }
+
+.rodape__nota { font-size: var(--t-xs); color: var(--texto-suave); }
+
+.rodape__legal {
+  background: var(--verde-mata);
+  color: #c4dbc9;
+  font-size: var(--t-xs);
+  padding-block: var(--e-4);
+}
+.rodape__legal p { margin: 0; }

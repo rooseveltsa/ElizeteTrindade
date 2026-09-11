@@ -1,0 +1,82 @@
+<!doctype html><meta charset="utf-8"><title>medindo</title>
+<style>
+html,body{margin:0;font:12px ui-monospace,monospace;background:#222;color:#eee}
+#palco{position:relative;height:700px;overflow:hidden}
+iframe{border:0;background:#fff;height:700px}
+pre{white-space:pre-wrap;padding:8px}
+</style>
+<div id="palco"></div>
+<pre id="saida">aguardando…</pre>
+<script>
+const LARGURAS = [320, 360, 390, 414, 768, 1024, 1280];
+const ESPERA = 3000;
+
+function nomear(e){
+  let s = e.tagName.toLowerCase();
+  if (e.id) s += '#' + e.id;
+  if (typeof e.className === 'string' && e.className.trim())
+    s += '.' + e.className.trim().split(/\s+/).join('.');
+  return s;
+}
+
+/* um elemento que estoura só importa se nada acima dele corta o excesso */
+function clipadoPorAncestral(e, w){
+  for (let p = e.parentElement; p; p = p.parentElement){
+    const s = w.getComputedStyle(p);
+    if (/hidden|clip|auto|scroll/.test(s.overflowX)) return nomear(p);
+  }
+  return null;
+}
+
+function medir(largura){
+  return new Promise(resolve => {
+    const palco = document.getElementById('palco');
+    palco.innerHTML = '';
+    const f = document.createElement('iframe');
+    f.width = largura; f.src = 'index.html';
+    f.addEventListener('load', () => setTimeout(() => {
+      const d = f.contentDocument, w = f.contentWindow;
+      d.querySelectorAll('link[rel="stylesheet"]').forEach(l => {
+        if (l.href.startsWith(location.origin)) l.href = l.href.split('?')[0] + '?v=' + Date.now();
+      });
+      const vw = d.documentElement.clientWidth;   /* já desconta a barra de rolagem */
+      const achados = [];
+      for (const e of d.querySelectorAll('body *')){
+        const r = e.getBoundingClientRect();
+        if (r.width === 0 && r.height === 0) continue;
+        const dir = Math.round(r.right), esq = Math.round(r.left);
+        if (dir <= vw + 1 && esq >= -1) continue;
+        achados.push({
+          nome: nomear(e), esq, dir, larg: Math.round(r.width),
+          clipadoPor: clipadoPorAncestral(e, w)
+        });
+      }
+      const reais = achados.filter(o => !o.clipadoPor);
+      /* o herói ainda está animando? */
+      const cartaz = d.querySelector('.cartaz img');
+      const tCartaz = cartaz ? w.getComputedStyle(cartaz).transform : null;
+      const oCartaz = cartaz ? w.getComputedStyle(cartaz).opacity : null;
+      resolve({
+        largura, vw,
+        scrollW: d.documentElement.scrollWidth,
+        rolagemHorizontal: d.documentElement.scrollWidth > vw + 1,
+        vazamentosReais: reais,
+        apenasClipados: achados.length - reais.length,
+        cartaz: { transform: tCartaz, opacity: oCartaz }
+      });
+      resolve.done = true;
+    }, ESPERA));
+    palco.appendChild(f);
+  });
+}
+
+(async () => {
+  const out = [];
+  for (const L of LARGURAS) {
+    document.getElementById('saida').textContent = 'medindo ' + L + 'px…';
+    out.push(await medir(L));
+  }
+  document.getElementById('saida').textContent = JSON.stringify(out, null, 1);
+  window.__resultado = out;
+})();
+</script>

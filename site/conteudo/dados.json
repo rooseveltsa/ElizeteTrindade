@@ -1,0 +1,77 @@
+{
+  "_leia": "Fonte única dos dados verificados. Toda informação publicada em index.html deve constar aqui, com a origem declarada. Nada entra sem origem.",
+  "candidatura": {
+    "nome": "Elizete Trindade",
+    "cargoEmDisputa": "Deputada Estadual",
+    "estado": "Amapá",
+    "partido": "União Brasil",
+    "numeroPartido": "44",
+    "numeroUrna": "44577",
+    "numeroUrnaExibicao": "44.577",
+    "mandatoAtual": null,
+    "origem": "informado pelo responsável e confirmado nas peças oficiais",
+    "cnpj": "68.430.706/0001-27",
+    "lema": "O Amapá merece mais forte, mais justo e humano",
+    "lemaNaPagina": false,
+    "lemaObservacao": "retirado da página a pedido do responsável, para deixar a faixa sob o cartaz só com a instrução da urna. O lema não está na arte do cartaz, então hoje não aparece em lugar nenhum do site."
+  },
+  "identidade": {
+    "slogan": "O Amapá merece mais forte, mais justo e humano.",
+    "origemSlogan": "PHOTO-2026-08-30-09-53-16.jpg",
+    "cores": {
+      "verdeProfundo": "#05331a",
+      "verde": "#0a5c2a",
+      "verdeVivo": "#1e8c3a",
+      "verdeFolha": "#4e9e1e",
+      "amarelo": "#fbb800",
+      "azul": "#0055aa"
+    },
+    "origemCores": "amostradas de PHOTO-2026-08-30-09-53-16.jpg e PHOTO-2026-08-13-12-47-47.jpg",
+    "cartazOficial": {
+      "arquivo": "assets/img/cartaz-oficial-1672.webp",
+      "origem": "heroelizete.png, fornecido pela campanha",
+      "conteudo": "Deputada Estadual • Amapá; marca Elizete Trindade; 44.577; CNPJ 68.430.706/0001-27"
+    }
+  },
+  "canais": {
+    "whatsapp": {
+      "numero": "(96) 99117-5205",
+      "link": "https://wa.me/5596991175205"
+    },
+    "instagram": {
+      "perfil": "@elizetetrindade_",
+      "link": "https://www.instagram.com/elizetetrindade_/"
+    }
+  },
+  "noticias": [],
+  "agenda": [],
+  "documentos": [],
+  "pendencias": {
+    "biografia": "texto de trajetória, formação e atuação profissional",
+    "documentoDePropostas": "arquivo com as propostas detalhadas (título, formato, data e link)",
+    "noticias": "nenhuma notícia verificada; a seção não existe no site",
+    "agenda": "nenhum evento com data, horário e local confirmados; a seção não existe no site",
+    "dominio": "endereço definitivo do site, necessário para a URL absoluta da imagem de compartilhamento",
+    "textosPublicos": "a página não traz notas de processo. As pendências ficam aqui e em comentários no index.html, não no texto que o visitante lê.",
+    "contato": "a faixa de contato saiu. O WhatsApp tem botão flutuante e aparece em texto no rodapé, junto do Instagram. Canal oficial novo entra no rodapé."
+  },
+  "propostas": [
+    {
+      "titulo": "Saúde",
+      "texto": "Mais acesso, qualidade e humanização na saúde pública, para cuidar de quem mais precisa."
+    },
+    {
+      "titulo": "Educação",
+      "texto": "Investir na educação é abrir portas para o futuro e transformar realidades."
+    },
+    {
+      "titulo": "Empreendedorismo",
+      "texto": "Apoio a quem gera emprego e renda, fortalecendo a economia e valorizando nossa gente."
+    },
+    {
+      "titulo": "Família e valores",
+      "texto": "Defender a família, promover o respeito e construir uma sociedade mais justa e solidária."
+    }
+  ],
+  "origemPropostas": "site de pré-campanha elizete-trindade.espa-o-de-tr-7712.chatgpt.site — em conferência"
+}

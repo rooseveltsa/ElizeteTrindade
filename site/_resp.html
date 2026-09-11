@@ -1,0 +1,38 @@
+<!doctype html><meta charset="utf-8"><title>resp</title>
+<style>
+body{margin:0;background:#2b2b2b;display:flex;gap:14px;padding:14px;font:12px ui-monospace,monospace;color:#fff;align-items:flex-start}
+figure{margin:0}figcaption{padding:4px 2px}
+iframe{border:0;background:#fff;display:block}
+</style>
+<body>
+<script>
+const q = new URLSearchParams(location.search);
+const ALTURA   = Number(q.get('h') || 2600);
+const TOPO     = Number(q.get('y') || 0);
+const LARGURAS = (q.get('l') || '360,390,768').split(',').map(Number);
+for (const L of LARGURAS){
+  const fig = document.createElement('figure');
+  fig.innerHTML = '<figcaption>' + L + '</figcaption>';
+  const quadro = document.createElement('iframe');
+  quadro.width = L;
+  fig.appendChild(quadro);
+  document.body.appendChild(fig);
+}
+for (const f of document.querySelectorAll('iframe')){
+  f.height = ALTURA;
+  f.addEventListener('load', () => {
+    const d = f.contentDocument;
+    /* o servidor de prévia não manda cabeçalho de cache, então o Chrome
+       reaproveita CSS antigo; reapontar cada folha força a releitura */
+    d.querySelectorAll('link[rel="stylesheet"]').forEach(l => {
+      if (l.href.startsWith(location.origin)) l.href = l.href.split('?')[0] + '?v=' + Date.now();
+    });
+    /* leva a página ao estado final: sem isso o quadro fica no repouso da animação */
+    d.documentElement.classList.remove('js-mov');
+    d.querySelectorAll('[data-mov]').forEach(e => e.classList.add('revelado'));
+    /* espera as folhas reapontadas e as imagens assentarem antes de rolar */
+    if (TOPO) setTimeout(() => f.contentWindow.scrollTo(0, TOPO), 1200);
+  });
+  f.src = 'index.html';
+}
+</script>

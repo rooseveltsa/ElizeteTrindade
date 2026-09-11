@@ -1,0 +1,88 @@
+/* ------------------------------------------------------------------
+   movimento.css — sistema de motion design e microinterações.
+   Todas as animações respeitam prefers-reduced-motion e não ocultam
+   conteúdo caso o JavaScript esteja desativado.
+   ------------------------------------------------------------------ */
+
+:root {
+  --curva: cubic-bezier(0.16, 1, 0.3, 1);
+  --curva-elastica: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.js-mov [data-mov] {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.js-mov [data-mov].revelado {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s var(--curva) var(--atraso, 0ms),
+    transform 0.7s var(--curva) var(--atraso, 0ms);
+}
+
+/* ------------------------------------------------------ entrada do herói */
+
+.js-mov .cartaz img { animation: cartazEntra 1.2s var(--curva) both; }
+@keyframes cartazEntra {
+  from { opacity: 0; transform: scale(1.04); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* --------------------------------------------------- cabeçalho compacto */
+
+.cabecalho { transition: box-shadow 0.3s ease, background-color 0.3s ease; }
+.cabecalho__barra { transition: min-height 0.3s var(--curva); }
+.marca img { transition: width 0.3s var(--curva); }
+
+.cabecalho[data-compacto="sim"] {
+  box-shadow: 0 2px 8px rgba(6, 51, 26, 0.08), 0 12px 28px rgba(6, 51, 26, 0.07);
+}
+.cabecalho[data-compacto="sim"] .cabecalho__barra { min-height: 58px; }
+.cabecalho[data-compacto="sim"] .marca img { width: clamp(120px, 15vw, 150px); }
+
+/* ----------------------------------------------- prévia da foto entrando */
+
+.js-mov .moldura__palco[data-entrou="sim"] { animation: palcoEntra 0.55s var(--curva-elastica); }
+@keyframes palcoEntra {
+  from { transform: scale(0.94); opacity: 0.7; }
+  to   { transform: none; opacity: 1; }
+}
+
+/* ----------------------------------------------- surgir de cartão e urna */
+
+.animar-surgir {
+  animation: surgirSuave 0.6s var(--curva) both;
+}
+@keyframes surgirSuave {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.animar-fim {
+  animation: fimEntra 0.45s var(--curva-elastica) both;
+}
+@keyframes fimEntra {
+  0%   { opacity: 0; transform: scale(0.65); }
+  75%  { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Efeito de flutuação e pulso */
+.pulsar-suave {
+  animation: pulsarSuave 2.5s ease-in-out infinite alternate;
+}
+@keyframes pulsarSuave {
+  0%   { transform: scale(1); }
+  100% { transform: scale(1.03); }
+}
+
+/* Redução de movimento por acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  .js-mov [data-mov] { opacity: 1; transform: none; }
+  .js-mov .cartaz img { animation: none; }
+  .js-mov .moldura__palco[data-entrou="sim"] { animation: none; }
+  .animar-surgir { animation: none; }
+  .animar-fim { animation: none; }
+  .pulsar-suave { animation: none; }
+}
