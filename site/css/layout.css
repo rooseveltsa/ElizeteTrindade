@@ -219,49 +219,95 @@
 
 
 /* -------------------------------------------------------------- rodapé */
-/* Uma coluna, quatro linhas: marca, identidade, canais e ressalva. O
-   WhatsApp tem botão flutuante, então aqui ele é texto como o resto. */
-
 .rodape {
-  background: var(--superficie);
-  border-top: 3px solid var(--folha);
-  padding-block: clamp(2.25rem, 4vw, 3.25rem) var(--e-5);
+  background: #052a15;
+  color: #e4ede5;
+  border-top: 3px solid var(--amarelo);
+  padding-top: clamp(2.5rem, 5vw, 4rem);
 }
-.rodape__grade { display: grid; justify-items: start; gap: var(--e-3); }
-.rodape .marca img { width: clamp(140px, 18vw, 170px); }
+
+.rodape__conteudo {
+  display: grid;
+  gap: var(--e-6);
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+@media (min-width: 768px) {
+  .rodape__conteudo {
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: var(--e-7);
+    align-items: start;
+  }
+}
+
+.rodape__coluna--marca .marca img {
+  width: clamp(150px, 18vw, 190px);
+  height: auto;
+}
 
 .rodape__identidade {
-  margin-top: var(--e-2);
+  margin-top: var(--e-3);
   font-size: var(--t-sm);
-  color: var(--texto-suave);
-  max-width: 66ch;
-  text-wrap: pretty;
+  color: #b8d2be;
+  line-height: 1.5;
+  max-width: 38ch;
 }
 
-.rodape__canais {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--e-3);
-  font-size: var(--t-sm);
-}
-.rodape__canais a {
+.rodape__rotulo {
   font-family: var(--fonte-titulo);
-  font-weight: 600;
-  color: var(--acento-texto);
-  text-decoration: none;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dourado);
+  margin: 0 0 var(--e-3);
 }
-.rodape__canais a:hover { text-decoration: underline; text-underline-offset: 4px; }
-.rodape__canais span { color: var(--borda); }
 
-.rodape__nota { font-size: var(--t-xs); color: var(--texto-suave); }
+.rodape__links,
+.rodape__canais-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.rodape__links a,
+.rodape__canal-link {
+  font-family: var(--fonte-titulo);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: #e4ede5;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  transition: color .15s ease, transform .15s ease;
+}
+
+.rodape__links a:hover,
+.rodape__canal-link:hover {
+  color: var(--amarelo);
+  transform: translateX(3px);
+}
+
+.rodape__canal-link svg {
+  flex-shrink: 0;
+  color: var(--amarelo);
+}
 
 .rodape__legal {
-  background: var(--verde-mata);
-  color: #c4dbc9;
-  font-size: var(--t-xs);
+  background: #031b0d;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-block: var(--e-4);
+  color: #8da894;
+  font-size: var(--t-xs);
+  text-align: center;
 }
-.rodape__legal p { margin: 0; }
+
+.rodape__legal p {
+  margin: 0;
+}
 
 /* --------------------------------------------------- faixas especializadas */
 .faixa--escura {
