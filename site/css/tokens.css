@@ -40,19 +40,19 @@
   --acento-texto: var(--verde-mata);
   --foco:         var(--azul);
 
-  /* Tipografia ------------------------------------------------------- */
-  --fonte-titulo: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --fonte-texto:  "Source Serif 4", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  /* Tipografia — Família única sem serifa para todo o site ----------- */
+  --fonte-titulo: "Archivo", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --fonte-texto:  "Archivo", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   --t-xs:    0.8125rem;
   --t-sm:    0.9375rem;
   --t-base:  1.0625rem;
   --t-md:    clamp(1.125rem, 0.3vw + 1.06rem, 1.25rem);
-  --t-lg:    clamp(1.3rem, 0.8vw + 1.1rem, 1.6rem);
-  --t-lema:  clamp(1.35rem, 1.5vw + 1rem, 2rem);
-  --t-secao: clamp(1.9rem, 2.6vw + 1.1rem, 3.1rem);
-  --t-nome:  clamp(2.9rem, 6.4vw + 0.4rem, 5.5rem);
-  --t-urna:  clamp(2.9rem, 5vw + 0.8rem, 4.5rem);
+  --t-lg:    clamp(1.25rem, 0.8vw + 1.1rem, 1.45rem);
+  --t-lema:  clamp(1.3rem, 1.5vw + 1rem, 1.75rem);
+  --t-secao: clamp(1.75rem, 3.5vw, 2.5rem);
+  --t-nome:  clamp(2.2rem, 5vw, 3.5rem);
+  --t-urna:  clamp(2.5rem, 4.5vw, 3.5rem);
 
   /* Espaçamento ------------------------------------------------------ */
   --e-1: 0.25rem;
@@ -63,25 +63,23 @@
   --e-6: 2rem;
   --e-7: 3rem;
   --e-8: 4rem;
-  --e-faixa: clamp(3.5rem, 7vw, 6.5rem);
+  --e-faixa: clamp(4rem, 6.5vw, 6rem); /* 64px mobile / 96px desktop */
 
   /* Medidas ---------------------------------------------------------- */
-  --largura: 1240px;
+  --largura: 1200px;
   --margem: clamp(1.25rem, 4vw, 2.5rem);
   --raio-sm: 6px;
-  --raio: 10px;
-  --raio-md: 14px;
-  --raio-lg: 20px;
+  --raio: 8px;
+  --raio-md: 8px;
+  --raio-lg: 8px;
   --raio-pill: 9999px;
   --altura-cabecalho: 72px;
 
-  /* Sombras e Elevação ----------------------------------------------- */
-  --sombra-sm: 0 2px 6px rgba(6, 51, 26, 0.06);
-  --sombra-md: 0 8px 24px -4px rgba(6, 51, 26, 0.10), 0 2px 6px -1px rgba(6, 51, 26, 0.05);
-  --sombra-lg: 0 18px 36px -6px rgba(6, 51, 26, 0.14), 0 6px 12px -2px rgba(6, 51, 26, 0.08);
-  --sombra-flutuante: 0 22px 48px rgba(6, 51, 26, 0.22);
-  --sombra-glow: 0 0 25px rgba(23, 128, 58, 0.35);
-  --sombra-glow-amarelo: 0 0 25px rgba(251, 184, 0, 0.45);
+  /* Sombras sutis e limpas ------------------------------------------- */
+  --sombra-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --sombra-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --sombra-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --sombra-flutuante: 0 12px 32px rgba(0, 0, 0, 0.18);
 
   /* Curvas e Movimento ----------------------------------------------- */
   --curva-suave: cubic-bezier(0.16, 1, 0.3, 1);

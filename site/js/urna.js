@@ -116,7 +116,7 @@ export function iniciarUrna(raiz = document) {
       if (visorCandidato) visorCandidato.hidden = true;
       if (visorFoto) visorFoto.hidden = true;
       if (visorInstrucao) {
-        visorInstrucao.innerHTML = 'Digite os 5 dígitos da sua candidata a Deputada Estadual: <strong>44577</strong>';
+        visorInstrucao.innerHTML = 'Digite os 5 dígitos: <strong>44577</strong>';
       }
     }
   }
@@ -168,7 +168,7 @@ export function iniciarUrna(raiz = document) {
         digitos = [];
         atualizarVisor();
         if (visorInstrucao) {
-          visorInstrucao.innerHTML = 'Voto em branco selecionado. Para votar em Elizete Trindade, digite <strong>44577</strong>.';
+          visorInstrucao.innerHTML = 'Voto em branco. Digite <strong>44577</strong> e aperte CONFIRMA.';
         }
       }
     });

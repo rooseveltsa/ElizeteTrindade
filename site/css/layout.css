@@ -262,3 +262,29 @@
   padding-block: var(--e-4);
 }
 .rodape__legal p { margin: 0; }
+
+/* --------------------------------------------------- faixas especializadas */
+.faixa--escura {
+  background: var(--verde-mata);
+  color: #e4ede5;
+  --texto: #e4ede5;
+  --texto-suave: #a9c1ae;
+  --acento-texto: #ffffff;
+  --borda: #1d4b30;
+  --papel: #0b4324;
+}
+
+.faixa--urna {
+  background: var(--superficie);
+  border-top: 1px solid var(--borda);
+  border-bottom: 1px solid var(--borda);
+}
+
+.secao-moldura {
+  background: var(--papel);
+}
+
+.apoio__envoltorio-central {
+  max-width: 520px;
+  margin-inline: auto;
+}

@@ -77,7 +77,7 @@ export function iniciarMoldura(raiz) {
     baixar.disabled = !pronto;
     abrir.disabled = !pronto;
     trocar.hidden = demonstracao;
-    escolher.textContent = demonstracao ? 'Escolher fotografia' : 'Escolher outra fotografia';
+    escolher.textContent = demonstracao ? 'Selecionar foto' : 'Trocar foto';
   }
 
   /* -------------------------------------------------- carregamento */
