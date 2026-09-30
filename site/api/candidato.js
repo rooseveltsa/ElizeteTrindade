@@ -1,134 +1,64 @@
-const BASE = "https://divulgacandcontas.tse.jus.br/divulga/rest/v1";
+import { inflateRawSync } from "node:zlib";
 
-const cache = globalThis.__colinhaTseCache || (globalThis.__colinhaTseCache = {
-  elections: null,
-  lists: new Map()
-});
+const CAND_URL="https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2026.zip";
+const PHOTO_URL="https://cdn.tse.jus.br/estatistica/sead/eleicoes/eleicoes2026/fotos/foto_cand2026_AP_div.zip";
+const cache=globalThis.__apCandCache||(globalThis.__apCandCache={cands:null,photos:null,loading:null});
 
-const headers = {
-  "Accept": "application/json, text/plain, */*",
-  "Accept-Language": "pt-BR,pt;q=0.9",
-  "User-Agent": "Mozilla/5.0",
-  "Referer": "https://divulgacandcontas.tse.jus.br/divulga/",
-  "Origin": "https://divulgacandcontas.tse.jus.br"
-};
-
-async function getJson(url) {
-  const r = await fetch(url, { headers });
-  if (!r.ok) throw new Error("TSE " + r.status);
-  return r.json();
-}
-
-function collectElectionIds(value, out = new Set()) {
-  if (!value) return out;
-  if (Array.isArray(value)) {
-    for (const item of value) collectElectionIds(item, out);
-    return out;
+function unzipEntries(buf){
+  const b=Buffer.from(buf); let eocd=-1;
+  for(let i=b.length-22;i>=Math.max(0,b.length-65557);i--){if(b.readUInt32LE(i)===0x06054b50){eocd=i;break}}
+  if(eocd<0)throw new Error("ZIP inválido");
+  const count=b.readUInt16LE(eocd+10), cdOff=b.readUInt32LE(eocd+16), out=[]; let p=cdOff;
+  for(let n=0;n<count;n++){
+    if(b.readUInt32LE(p)!==0x02014b50)break;
+    const method=b.readUInt16LE(p+10), csize=b.readUInt32LE(p+20), usize=b.readUInt32LE(p+24);
+    const nlen=b.readUInt16LE(p+28), xlen=b.readUInt16LE(p+30), clen=b.readUInt16LE(p+32), loff=b.readUInt32LE(p+42);
+    const name=b.subarray(p+46,p+46+nlen).toString("utf8");
+    const ln=b.readUInt16LE(loff+26), lx=b.readUInt16LE(loff+28), start=loff+30+ln+lx;
+    const comp=b.subarray(start,start+csize);
+    let data; if(method===0)data=comp; else if(method===8)data=inflateRawSync(comp); else data=null;
+    if(data)out.push({name,data,usize});
+    p+=46+nlen+xlen+clen;
   }
-  if (typeof value !== "object") return out;
-
-  const year = Number(value.ano || value.anoEleicao || value.nrAno || 0);
-  const name = String(value.nomeEleicao || value.descricao || value.nome || "").toLowerCase();
-  const looks2026 = year === 2026 || name.includes("2026");
-
-  if (looks2026) {
-    for (const key of ["id", "sqEleicao", "codigo", "idEleicao"]) {
-      const n = Number(value[key]);
-      if (Number.isFinite(n) && n > 100) out.add(String(value[key]));
-    }
-  }
-  for (const v of Object.values(value)) collectElectionIds(v, out);
   return out;
 }
-
-async function electionIds() {
-  if (cache.elections?.length) return cache.elections;
-  const ids = new Set(["20322002026"]);
-
-  try {
-    const ord = await getJson(BASE + "/eleicao/ordinarias");
-    collectElectionIds(ord, ids);
-  } catch {}
-
-  cache.elections = [...ids];
-  return cache.elections;
-}
-
-function candidateArray(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.candidatos)) return data.candidatos;
-  if (Array.isArray(data?.candidados)) return data.candidados;
-  for (const v of Object.values(data || {})) {
-    if (Array.isArray(v) && v.some(x => x && typeof x === "object" && ("numero" in x || "nr_CANDIDATO" in x))) return v;
-  }
-  return [];
-}
-
-async function listCandidates(ue, election, cargo) {
-  const key = [ue, election, cargo].join(":");
-  if (cache.lists.has(key)) return cache.lists.get(key);
-
-  const url = BASE + "/candidatura/listar/2026/" + encodeURIComponent(ue) + "/" + encodeURIComponent(election) + "/" + encodeURIComponent(cargo) + "/candidatos";
-  const data = await getJson(url);
-  const list = candidateArray(data);
-  cache.lists.set(key, list);
-  return list;
-}
-
-function normalizeCandidate(c) {
-  return {
-    id: c.id || c.sq_CANDIDATO || c.sqCandidato || null,
-    numero: String(c.numero ?? c.nr_CANDIDATO ?? c.nrCandidato ?? ""),
-    nome: c.nomeUrna || c.nm_URNA || c.nomeCompleto || c.nm_CANDIDATO || "",
-    partido: c.partido?.sigla || c.sg_PARTIDO || c.siglaPartido || "",
-    foto: c.fotoUrl || c.urlFoto || c.foto || "",
-    situacao: c.descricaoSituacao || c.situacaoCandidato || c.descricaoTotalizacao || ""
-  };
-}
-
-export default async function handler(req, res) {
-  res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
-
-  const cargo = Number(req.query.cargo);
-  const numero = String(req.query.numero || "").replace(/\D/g, "");
-
-  if (!cargo || !numero) {
-    return res.status(400).json({ ok:false, error:"Parâmetros inválidos" });
-  }
-
-  // Cargos estaduais/federais desta colinha são sempre consultados no Amapá.
-  // Presidente é uma candidatura nacional.
-  const ue = cargo === 1 ? "BR" : "AP";
-
-  // Reconhecimento local da identidade da própria candidata, sem depender de rede.
-  if (cargo === 7 && numero === "44577") {
-    return res.status(200).json({
-      ok:true,
-      source:"local",
-      candidate:{
-        id:null,
-        numero:"44577",
-        nome:"Elizete Trindade",
-        partido:"UNIÃO",
-        foto:"/assets/img/retrato-candidatura-560.jpg",
-        situacao:""
-      }
-    });
-  }
-
-  try {
-    const ids = await electionIds();
-    for (const election of ids) {
-      try {
-        const list = await listCandidates(ue, election, cargo);
-        const found = list.map(normalizeCandidate).find(c => c.numero === numero);
-        if (found) {
-          return res.status(200).json({ ok:true, candidate:found, source:"TSE", ue });
-        }
-      } catch {}
+function splitCsv(line){const a=[];let q=false,s="";for(let i=0;i<line.length;i++){const ch=line[i];if(ch=='"'&&line[i+1]=='"'){s+='"';i++;continue}if(ch=='"'){q=!q;continue}if(ch===';'&&!q){a.push(s);s="";continue}s+=ch}a.push(s);return a}
+async function load(){
+  if(cache.cands&&cache.photos)return;
+  if(cache.loading)return cache.loading;
+  cache.loading=(async()=>{
+    const [cr,pr]=await Promise.all([fetch(CAND_URL),fetch(PHOTO_URL)]);
+    if(!cr.ok||!pr.ok)throw new Error("Falha ao carregar base oficial");
+    const [cz,pz]=await Promise.all([cr.arrayBuffer(),pr.arrayBuffer()]);
+    const cent=unzipEntries(cz).find(e=>/consulta_cand_2026_AP\.csv$/i.test(e.name));
+    if(!cent)throw new Error("CSV do Amapá não encontrado");
+    const txt=cent.data.toString("latin1"), lines=txt.split(/\r?\n/).filter(Boolean), head=splitCsv(lines[0]);
+    const ix=n=>head.indexOf(n), map=new Map();
+    for(const line of lines.slice(1)){
+      const v=splitCsv(line), cargo=v[ix("DS_CARGO")], numero=v[ix("NR_CANDIDATO")];
+      if(!numero||!["DEPUTADO FEDERAL","DEPUTADO ESTADUAL","SENADOR","GOVERNADOR"].includes(cargo))continue;
+      map.set(cargo+"|"+numero,{id:v[ix("SQ_CANDIDATO")],numero,nome:v[ix("NM_URNA_CANDIDATO")]||v[ix("NM_CANDIDATO")],partido:v[ix("SG_PARTIDO")],cargo});
     }
-    return res.status(404).json({ ok:false, error:"Candidatura não localizada no " + (ue === "AP" ? "Amapá" : "Brasil") });
-  } catch {
-    return res.status(502).json({ ok:false, error:"Fonte oficial temporariamente indisponível" });
-  }
+    const photos=new Map();
+    for(const e of unzipEntries(pz)){
+      const m=e.name.match(/(\d{8,})[^/]*\.(jpe?g|png)$/i); if(!m)continue;
+      const mime=/png$/i.test(m[2])?"image/png":"image/jpeg";
+      photos.set(m[1],"data:"+mime+";base64,"+e.data.toString("base64"));
+    }
+    cache.cands=map;cache.photos=photos;
+  })().finally(()=>cache.loading=null);
+  return cache.loading;
+}
+const cargoMap={6:"DEPUTADO FEDERAL",7:"DEPUTADO ESTADUAL",5:"SENADOR",3:"GOVERNADOR"};
+export default async function handler(req,res){
+  res.setHeader("Cache-Control","s-maxage=21600, stale-while-revalidate=86400");
+  const cargo=Number(req.query.cargo),numero=String(req.query.numero||"").replace(/\D/g,"");
+  if(!cargo||!numero)return res.status(400).json({ok:false,error:"Parâmetros inválidos"});
+  if(cargo===1)return res.status(404).json({ok:false,error:"Presidente não pertence à base do Amapá"});
+  try{
+    await load();
+    const key=cargoMap[cargo]+"|"+numero, c=cache.cands.get(key);
+    if(!c)return res.status(404).json({ok:false,error:"Número não localizado entre os candidatos do Amapá"});
+    return res.status(200).json({ok:true,source:"TSE",candidate:{...c,foto:cache.photos.get(c.id)||""}});
+  }catch(e){return res.status(502).json({ok:false,error:"Base oficial temporariamente indisponível",detail:String(e?.message||e)})}
 }
