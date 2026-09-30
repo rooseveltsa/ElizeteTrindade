@@ -14,7 +14,7 @@ const headers = {
 };
 
 async function getJson(url) {
-  const r = await fetch(url, { headers, next: { revalidate: 3600 } });
+  const r = await fetch(url, { headers });
   if (!r.ok) throw new Error("TSE " + r.status);
   return r.json();
 }
@@ -42,13 +42,8 @@ function collectElectionIds(value, out = new Set()) {
 }
 
 async function electionIds() {
-  if (cache.elections) return cache.elections;
-  const ids = new Set();
-
-  try {
-    const atual = await getJson(BASE + "/eleicao/eleicao-atual");
-    collectElectionIds(atual, ids);
-  } catch {}
+  if (cache.elections?.length) return cache.elections;
+  const ids = new Set(["20322002026"]);
 
   try {
     const ord = await getJson(BASE + "/eleicao/ordinarias");
@@ -96,9 +91,30 @@ export default async function handler(req, res) {
 
   const cargo = Number(req.query.cargo);
   const numero = String(req.query.numero || "").replace(/\D/g, "");
-  const ue = String(req.query.ue || "AP").toUpperCase();
 
-  if (!cargo || !numero) return res.status(400).json({ ok:false, error:"Parâmetros inválidos" });
+  if (!cargo || !numero) {
+    return res.status(400).json({ ok:false, error:"Parâmetros inválidos" });
+  }
+
+  // Cargos estaduais/federais desta colinha são sempre consultados no Amapá.
+  // Presidente é uma candidatura nacional.
+  const ue = cargo === 1 ? "BR" : "AP";
+
+  // Reconhecimento local da identidade da própria candidata, sem depender de rede.
+  if (cargo === 7 && numero === "44577") {
+    return res.status(200).json({
+      ok:true,
+      source:"local",
+      candidate:{
+        id:null,
+        numero:"44577",
+        nome:"Elizete Trindade",
+        partido:"UNIÃO",
+        foto:"/assets/img/retrato-candidatura-560.jpg",
+        situacao:""
+      }
+    });
+  }
 
   try {
     const ids = await electionIds();
@@ -106,10 +122,12 @@ export default async function handler(req, res) {
       try {
         const list = await listCandidates(ue, election, cargo);
         const found = list.map(normalizeCandidate).find(c => c.numero === numero);
-        if (found) return res.status(200).json({ ok:true, candidate:found, source:"TSE" });
+        if (found) {
+          return res.status(200).json({ ok:true, candidate:found, source:"TSE", ue });
+        }
       } catch {}
     }
-    return res.status(404).json({ ok:false, error:"Candidatura não localizada" });
+    return res.status(404).json({ ok:false, error:"Candidatura não localizada no " + (ue === "AP" ? "Amapá" : "Brasil") });
   } catch {
     return res.status(502).json({ ok:false, error:"Fonte oficial temporariamente indisponível" });
   }
